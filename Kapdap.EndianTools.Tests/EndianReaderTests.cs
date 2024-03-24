@@ -11,6 +11,7 @@
  */
 
 using Kapdap.EndianTools.IO;
+using System.Text;
 
 namespace Kapdap.EndianTools.Tests
 {
@@ -40,6 +41,8 @@ namespace Kapdap.EndianTools.Tests
             Assert.AreEqual(EndianTestData.TestValues[8], reader.ReadFixedLengthString(12));
             Assert.AreEqual(EndianTestData.TestValues[9], reader.ReadBoolean());
             Assert.AreEqual(EndianTestData.TestValues[10], reader.ReadBoolean());
+            Assert.AreEqual(EndianTestData.TestValues[11], reader.ReadChar());
+            Assert.AreEqual(EndianTestData.TestValues[12], reader.ReadChar(Encoding.BigEndianUnicode));
         }
 
         [TestMethod]
@@ -65,6 +68,8 @@ namespace Kapdap.EndianTools.Tests
             Assert.AreEqual(EndianTestData.TestValues[8], reader.ReadFixedLengthString(12));
             Assert.AreEqual(EndianTestData.TestValues[9], reader.ReadBoolean());
             Assert.AreEqual(EndianTestData.TestValues[10], reader.ReadBoolean());
+            Assert.AreEqual(EndianTestData.TestValues[11], reader.ReadChar());
+            Assert.AreEqual(EndianTestData.TestValues[12], reader.ReadChar(Encoding.Unicode));
         }
     }
 }

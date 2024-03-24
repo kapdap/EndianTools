@@ -35,6 +35,8 @@ namespace Kapdap.EndianTools.Tests
             writer.Write((string)EndianTestData.TestValues[8], 12);
             writer.Write((bool)EndianTestData.TestValues[9]);
             writer.Write((bool)EndianTestData.TestValues[10]);
+            writer.Write((char)EndianTestData.TestValues[11]);
+            writer.Write((char)EndianTestData.TestValues[12], Encoding.BigEndianUnicode);
 
             writer.Position = 0;
 
@@ -63,6 +65,8 @@ namespace Kapdap.EndianTools.Tests
             writer.Write((string)EndianTestData.TestValues[8], 12);
             writer.Write((bool)EndianTestData.TestValues[9]);
             writer.Write((bool)EndianTestData.TestValues[10]);
+            writer.Write((char)EndianTestData.TestValues[11]);
+            writer.Write((char)EndianTestData.TestValues[12], Encoding.Unicode);
 
             writer.Position = 0;
 
@@ -165,26 +169,55 @@ namespace Kapdap.EndianTools.Tests
         [TestMethod]
         public void Write_ArrayTests()
         {
-            char[] chars = new char[EndianTestData.LittleEndianData.Length];
-            for (int i = 0; i < chars.Length; i++)
-                chars[i] = (char)EndianTestData.LittleEndianData[i];
+            char[] chars = { 'H', 'e', 'l', 'l', 'o', '&', };
 
             var stream = new MemoryStream();
-            var writer = new EndianWriter(stream, Encoding.ASCII);
+            var writer = new EndianWriter(stream);
 
             writer.Write(EndianTestData.LittleEndianData, 0, 2);
             writer.Write(EndianTestData.LittleEndianData, 2, 2);
             writer.Write(EndianTestData.LittleEndianData.AsSpan().Slice(0, 2));
-            writer.Write(EndianTestData.LittleEndianData.AsSpan().Slice(2, 2));
 
+            writer.Write(chars);
             writer.Write(chars, 0, 2);
             writer.Write(chars, 2, 2);
             writer.Write(chars.AsSpan().Slice(0, 2));
-            writer.Write(chars.AsSpan().Slice(2, 2));
 
             writer.Position = 0;
 
-            Span<byte> data = [0x5F, 0x50, 0x5F, 0xCC, 0x5F, 0x50, 0x5F, 0xCC, 0x5F, 0x50, 0x5F, 0x3F, 0x5F, 0x50, 0x5F, 0x3F];
+            Span<byte> data = [0x5F, 0x50, 0x5F, 0xCC, 0x5F, 0x50, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x26, 0x48, 0x65, 0x6C, 0x6C, 0x48, 0x65];
+            Span<byte> buffer = new byte[stream.Length];
+
+            stream.Read(buffer);
+
+            Assert.AreEqual(true, data.SequenceEqual(buffer));
+        }
+
+        [TestMethod]
+        public void Write_CharByteTests()
+        {
+            char[] chars = { 'H', 'e', 'l', 'l', 'o', '&', };
+
+            var stream = new MemoryStream();
+            var writer = new EndianWriter(stream);
+
+            writer.Write(chars[0]);
+            writer.Write(chars[1]);
+            writer.Write(chars[2]);
+            writer.Write(chars[3]);
+            writer.Write(chars[4]);
+            writer.Write(chars[5]);
+
+            writer.Write(chars[0], Encoding.Unicode);
+            writer.Write(chars[1], Encoding.Unicode);
+            writer.Write(chars[2], Encoding.Unicode);
+            writer.Write(chars[3], Encoding.BigEndianUnicode);
+            writer.Write(chars[4], Encoding.BigEndianUnicode);
+            writer.Write(chars[5], Encoding.BigEndianUnicode);
+
+            writer.Position = 0;
+
+            Span<byte> data = [0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x26, 0x48, 0x00, 0x65, 0x00, 0x6C, 0x00, 0x00, 0x6C, 0x00, 0x6F, 0x00, 0x26];
             Span<byte> buffer = new byte[stream.Length];
 
             stream.Read(buffer);
