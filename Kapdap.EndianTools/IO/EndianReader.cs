@@ -231,11 +231,10 @@ namespace Kapdap.EndianTools.IO
             int i = 0;
             while (Position < Length)
             {
-                if (charSize == 2)
-                    charBytes[1] = (byte)BaseStream.ReadByte();
+                charBytes[0] = (byte)BaseStream.ReadByte();
 
-                if (Position < Length)
-                    charBytes[0] = (byte)BaseStream.ReadByte();
+                if (charSize == 2 && Position < Length)
+                    charBytes[1] = (byte)BaseStream.ReadByte();
 
                 chars[i++] = encoding.GetChars(charBytes, 0, charSize)[0];
 
